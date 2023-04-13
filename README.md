@@ -1,7 +1,7 @@
 # seekdeep_nanopore
 a basic workflow for running seekdeep on nanopore
 
-##Installation:
+## Installation:
 Install conda with:
 https://github.com/conda-forge/miniforge#mambaforge
 
@@ -10,7 +10,7 @@ Install snakemake in an environment called snakemake with:
 conda create -c conda-forge -c bioconda -n snakemake snakemake
 ```
 
-##Usage:
+## Usage:
  - Change directory to a folder where you want to run the analysis
  - Download the seekdeep_nanopore_general.smk file into this folder
  - Download the sif file from here into the same folder: https://seekdeep.brown.edu/programs/elucidator.sif

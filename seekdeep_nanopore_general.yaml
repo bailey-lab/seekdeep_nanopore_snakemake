@@ -1,24 +1,17 @@
 #information about your system
 sif_file_location: /work/www/build/SeekDeep_site/SeekDeep/programs/elucidator.sif #location of downloaded sif file
 output_folder: seekdeep_output_files2 #this is where output will go
-cpus_to_use: 16 #higher CPU count speeds up runtime, uses more memory
-username: asimkin #set the username of your system here
+cpus_to_use: 16 #higher CPU count speeds up runtime, uses more memory, don't exceed your system's available CPU count or available memory.
 
-#don't exceed your system's available CPU count or available memory.
-
-#this folder should have 2 things: a folder of demultiplexed fastq files and a
-#tab delimited file of primers
+#this folder should have 2 things: a folder of demultiplexed fastq files and a tab delimited file of primers
 primer_plus_fastq_binding: /work/bailey_share/processed_data/nwernsma/221227_4CASTtransMIT
 fastq_subfolder: compiledfastq #name of the demultiplexed fastq folder
 primer_file: inner_ids.tab.txt #name of the primer file
 
-#this folder should have 2 things: a folder of bowtie2 indexed genomes and a
-#folder of gff files for each genome
+#this folder should have 2 things: a folder of bowtie2 indexed genomes and a folder of gff files for each genome
 genome_binding: /work/asimkin/seekdeep/jess_4cast/testing_snakemake_nanopore_general/selected_pf3k_genomes
 genome_subfolder: genomes #folder name of bowtie2 indexed genomes
 gff_subfolder: info/gff #folder name of gff files
 
-#these are standard parameters that a user can tweak if seekdeep is failing to
-#retrieve accurate haplotypes
+#these are standard parameters that a user can tweak if seekdeep is failing to retrieve accurate haplotypes
 fake_insert_size: 250
-

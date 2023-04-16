@@ -7,6 +7,21 @@ rule all:
 		analysis_done=config['output_folder']+'/finished_analysis.txt'	
 #		analysis_done=config['output_folder']+'/analysis/popClustering'
 
+rule copy_files:
+	'''
+	copies snakemake script and config files to output folder for reproducibility.
+	'''
+	input:
+		in_snakefile='seekdeep_nanopore_general.smk'
+		in_config_file='seekdeep_nanopore_general.yaml'
+	output:
+		out_snakefile=config['output_folder']+'seekdeep_nanopore_general.smk',
+		out_config_file=config['output_folder']+'seekdeep_nanopore_general.yaml'
+	shell:
+		'''
+		cp {input.in_snakefile} {output.out_snakefile}
+		cp {input.in_config_file} {output.out_config_file}
+		'''
 
 rule get_primer_info:
 	input:
@@ -90,7 +105,7 @@ rule runAnalysis:
 		singularity exec -B {input.data_folder}:/input_data \
 		-B {params.output_dir}:/seekdeep_output \
 		-H {params.output_dir}/analysis/:/home/analysis \
-		{input.sif_file} ./runAnalysis.sh
+		{input.sif_file} ./runAnalysis.sh {threads}
 		touch {output.analysis_done}
 		'''
 

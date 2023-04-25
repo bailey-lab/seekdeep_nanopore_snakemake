@@ -15,3 +15,4 @@ gff_subfolder: info/gff #folder name of gff files
 
 #these are standard parameters that a user can tweak if seekdeep is failing to retrieve accurate haplotypes
 fake_insert_size: 250
+extra_gen_target_info_cmds: '"--errors 2"'

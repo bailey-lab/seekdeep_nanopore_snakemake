@@ -1,11 +1,9 @@
 configfile: 'seekdeep_nanopore_general.yaml'
-
 rule all:
 	input:
-#		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
-#		done=config['output_folder']+'/finished_setup.txt'
 		analysis_done=config['output_folder']+'/finished_analysis.txt'	
-#		analysis_done=config['output_folder']+'/analysis/popClustering'
+		out_snakefile=config['output_folder']+'seekdeep_nanopore_general.smk',
+		out_config_file=config['output_folder']+'seekdeep_nanopore_general.yaml'
 
 rule copy_files:
 	'''
@@ -23,7 +21,7 @@ rule copy_files:
 		cp {input.in_config_file} {output.out_config_file}
 		'''
 
-rule get_primer_info:
+rule genTargetInfoFromGenomes:
 	input:
 		data_folder=config['primer_plus_fastq_binding'],
 		genome_root_folder=config['genome_binding'],
@@ -33,7 +31,8 @@ rule get_primer_info:
 		primer_file=config['primer_file'],
 		gff_subfolder=config['gff_subfolder'],
 		genome_subfolder=config['genome_subfolder'],
-		fake_insert_size=config['fake_insert_size']
+		fake_insert_size=config['fake_insert_size'],
+		extra_args=config['extra_gen_target_info_cmds']
 	output:
 		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
 	threads: config['cpus_to_use']
@@ -44,8 +43,8 @@ rule get_primer_info:
 		-B {params.output_dir}:/seekdeep_output {input.sif_file} \
 		SeekDeep genTargetInfoFromGenomes --primers /input_data/{params.primer_file} \
 		--pairedEndLength {params.fake_insert_size} --genomeDir /genome_info/{params.genome_subfolder} \
-		--gffDir /genome_info/{params.gff_subfolder} --dout \
-		/seekdeep_output/extractedRefSeqs --errors 2 --overWriteDir --numThreads \
+		--gffDir /genome_info/{params.gff_subfolder} {params.extra_args} --dout \
+		/seekdeep_output/extractedRefSeqs --overWriteDir --numThreads \
 		{threads} --shortNames
 		'''
 

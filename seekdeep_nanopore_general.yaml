@@ -2,11 +2,23 @@
 sif_file_location: /work/www/build/SeekDeep_site/SeekDeep/programs/elucidator.sif #location of downloaded sif file
 output_folder: seekdeep_output_files2 #this is where output will go
 cpus_to_use: 16 #higher CPU count speeds up runtime, uses more memory, don't exceed your system's available CPU count or available memory.
+max_run_time_min: 5760 #maximum amount of time you think this job will take
+max_memory_mb: 300000 #maximum amount of memory you think this job will need
 
 #this folder should have 2 things: a folder of demultiplexed fastq files and a tab delimited file of primers
 primer_plus_fastq_binding: /work/bailey_share/processed_data/nwernsma/221227_4CASTtransMIT
 fastq_subfolder: compiledfastq #name of the demultiplexed fastq folder
 primer_file: inner_ids.tab.txt #name of the primer file
+#If the folder of fastq files consists of soft links to fastq files, the path to
+#the original fastq files should be 'bound' in the singularity image. Syntax is:
+#-B original/fastq/location:original/fastq/location
+#(otherwise set this variable as empty quotes '')
+#caution: do not run your snakemake job from any of the direct descendant
+#folders of this path - e.g. if path is /home/username/folder1/folder2/fastq, seekdeep
+#can be run from /home/username/folder3 or /home/username/folder1/folder4, but
+#not /home/username/folder1 or /home/username/folder1/folder2. Otherwise later
+#home bindings will break.
+softlink_fastq_binding: '-B real/path/to/fastqs:real/path/to/fastqs'
 
 #this folder should have 2 things: a folder of bowtie2 indexed genomes and a folder of gff files for each genome
 genome_binding: /work/asimkin/seekdeep/jess_4cast/testing_snakemake_nanopore_general/selected_pf3k_genomes
@@ -16,3 +28,12 @@ gff_subfolder: info/gff #folder name of gff files
 #these are standard parameters that a user can tweak if seekdeep is failing to retrieve accurate haplotypes
 fake_insert_size: 250
 extra_gen_target_info_cmds: '"--errors 2"'
+extra_extractor_cmds: '--extraExtractorCmds="--primerWithinStart 40
+  --minLenCutOff 100"'
+extra_kluster_cmds: '--extraKlusterCmds="--readLengthMinDiff 30
+  --numThreads {threads}"'
+extra_process_cluster_cmds: '--extraProcessClusterCmds=
+  "--replicateMinTotalReadCutOff 10
+  --previousPop-largeBaseIndel 0.99 --previousPop-oneBaseIndel 0.99
+  --previousPop-twoBaseIndel 0.99"'
+

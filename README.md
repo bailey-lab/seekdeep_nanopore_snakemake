@@ -7,7 +7,7 @@ https://github.com/conda-forge/miniforge#mambaforge
 
 Install snakemake in an environment called snakemake with:
 ```bash
-conda create -c conda-forge -c bioconda -n snakemake snakemake
+mamba create -c conda-forge -c bioconda -n snakemake snakemake
 ```
 
 ## Usage:

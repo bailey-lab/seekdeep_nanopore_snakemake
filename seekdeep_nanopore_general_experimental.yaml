@@ -1,0 +1,37 @@
+#information about your system
+sif_file_location: /nfs/jbailey5/baileyweb/bailey_share/bin/elucidator_23-07-19.sif #location of downloaded sif file
+output_folder: /nfs/jbailey5/baileyweb/asimkin/seekdeep/jess_4cast/plates_1-6/neeva_version/seekdeep_output #this is where output will go
+cpus_to_use: 14 #higher CPU count speeds up runtime, uses more memory, don't exceed your system's available CPU count or available memory.
+max_run_time_min: 5760 #maximum amount of time you think this job will take
+max_memory_mb: 300000 #maximum amount of memory you think this job will need
+
+#this folder should have 2 things: a folder of demultiplexed fastq files and a tab delimited file of primers
+primer_plus_fastq_binding: /nfs/jbailey5/baileyweb/asimkin/seekdeep/jess_4cast/plates_1-6/neeva_version
+fastq_subfolder: fastq #name of the demultiplexed fastq folder
+primer_file: inner_ids.tab.txt #name of the primer file
+#If the folder of fastq files consists of soft links to fastq files, the path to
+#the original fastq files should be 'bound' in the singularity image. Syntax is:
+#-B original/fastq/location:original/fastq/location
+#(otherwise set this variable as empty quotes '')
+#caution: do not run your snakemake job from any of the direct descendant
+#folders of this path - e.g. if path is /home/username/folder1/folder2/fastq, seekdeep
+#can be run from /home/username/folder3 or /home/username/folder1/folder4, but
+#not /home/username/folder1 or /home/username/folder1/folder2. Otherwise later
+#home bindings will break.
+softlink_fastq_binding: '-B /nfs/jbailey5/baileyweb/bailey_share/processed_data/nwernsma/4CASTtransmit/allSamplesMergedFastqs'
+
+#this folder should have 2 things: a folder of bowtie2 indexed genomes and a folder of gff files for each genome
+genome_binding: /nfs/jbailey5/baileyweb/www/SeekDeep/data/plasmodiumData/pf
+genome_subfolder: genomes #folder name of bowtie2 indexed genomes
+gff_subfolder: info/gff #folder name of gff files
+
+#these are standard parameters that a user can tweak if seekdeep is failing to retrieve accurate haplotypes
+extra_gen_target_info_cmds: '--errors 2'
+extra_extractor_cmds: '--extraExtractorCmds="--primerWithinStart 40
+  --minLenCutOff 100"'
+extra_kluster_cmds: '--extraKlusterCmds="--readLengthMinDiff 30
+  --numThreads 1"'
+#threshold indels below which a haplotype gets renamed as a reference.
+extra_process_cluster_cmds: '--extraProcessClusterCmds="--replicateMinTotalReadCutOff 10
+  --previousPop-largeBaseIndel 0.99 --previousPop-oneBaseIndel 0.99
+  --previousPop-twoBaseIndel 0.99"'

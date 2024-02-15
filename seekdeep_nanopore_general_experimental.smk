@@ -87,18 +87,32 @@ rule setupTarAmpAnalysis:
 		touch {output.setup_done}
 		'''
 
+rule setup_analysis:
+	'''
+	A kludgy shell script solution to get snakemake to change directory to the
+	analysis directory, where runAnalysis.sh uses relative paths
+	'''
+	input:
+		setup_done=config['output_folder']+'/finished_setup.txt',
+	threads: config['cpus_to_use']
+	output:
+		final_script=config['output_folder']+'/analysis_script.sh',
+	shell:
+		'''
+		echo cd $'/seekdeep_output/analysis\n./runAnalysis.sh {threads}' >{output.final_script}
+		'''
+
 rule runAnalysis:
 	input:
+		final_script=config['output_folder']+'/analysis_script.sh',
 		data_folder=config['primer_plus_fastq_binding'],
 		sif_file=config['sif_file_location'],
-		setup_done=config['output_folder']+'/finished_setup.txt',
 		genome_root_folder=config['genome_binding']
 	params:
 		output_dir=config['output_folder'],
 		softlink_fastq_binding=config['softlink_fastq_binding']
 	output:
 		analysis_done=config['output_folder']+'/finished_analysis.txt'
-	threads: config['cpus_to_use']
 	resources:
 		time_min=config['max_run_time_min'],
 		mem_mb=config['max_memory_mb'],
@@ -109,7 +123,6 @@ rule runAnalysis:
 		-B {params.output_dir}:/seekdeep_output \
 		-B {input.genome_root_folder}:/genome_info \
 		{params.softlink_fastq_binding} \
-		-H {params.output_dir}/analysis/:/home/analysis \
-		{input.sif_file} ./runAnalysis.sh {threads}
+		{input.sif_file} bash /seekdeep_output/analysis_script.sh
 		touch {output.analysis_done}
 		'''

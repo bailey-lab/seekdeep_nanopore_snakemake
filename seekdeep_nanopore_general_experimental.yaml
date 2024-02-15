@@ -1,12 +1,12 @@
 #information about your system
 sif_file_location: /nfs/jbailey5/baileyweb/bailey_share/bin/elucidator_23-07-19.sif #location of downloaded sif file
-output_folder: /nfs/jbailey5/baileyweb/asimkin/seekdeep/jess_4cast/plates_1-6/neeva_version/seekdeep_output #this is where output will go
+output_folder: /nfs/jbailey5/baileyweb/asimkin/tes_2017_mikalayi/4cast_nanopore/inner_primers_v2 #this is where output will go
 cpus_to_use: 14 #higher CPU count speeds up runtime, uses more memory, don't exceed your system's available CPU count or available memory.
 max_run_time_min: 5760 #maximum amount of time you think this job will take
 max_memory_mb: 300000 #maximum amount of memory you think this job will need
 
 #this folder should have 2 things: a folder of demultiplexed fastq files and a tab delimited file of primers
-primer_plus_fastq_binding: /nfs/jbailey5/baileyweb/asimkin/seekdeep/jess_4cast/plates_1-6/neeva_version
+primer_plus_fastq_binding: /nfs/jbailey5/baileyweb/asimkin/tes_2017_mikalayi/4cast_nanopore/inner_primers/input_files
 fastq_subfolder: fastq #name of the demultiplexed fastq folder
 primer_file: inner_ids.tab.txt #name of the primer file
 #If the folder of fastq files consists of soft links to fastq files, the path to
@@ -18,10 +18,10 @@ primer_file: inner_ids.tab.txt #name of the primer file
 #can be run from /home/username/folder3 or /home/username/folder1/folder4, but
 #not /home/username/folder1 or /home/username/folder1/folder2. Otherwise later
 #home bindings will break.
-softlink_fastq_binding: '-B /nfs/jbailey5/baileyweb/bailey_share/processed_data/nwernsma/4CASTtransmit/allSamplesMergedFastqs'
+softlink_fastq_binding: '-B /nfs/jbailey5/baileyweb/bailey_share/processed_data/nwernsma/230405_4CASTMikalayi/compiledfastqs'
 
 #this folder should have 2 things: a folder of bowtie2 indexed genomes and a folder of gff files for each genome
-genome_binding: /nfs/jbailey5/baileyweb/www/SeekDeep/data/plasmodiumData/pf
+genome_binding: /nfs/jbailey5/baileyweb/www/SeekDeep/data/plasmodiumData/genomes/pf
 genome_subfolder: genomes #folder name of bowtie2 indexed genomes
 gff_subfolder: info/gff #folder name of gff files
 

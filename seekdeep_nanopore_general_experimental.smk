@@ -97,9 +97,8 @@ rule runAnalysis:
 		output_dir=config['output_folder'],
 		softlink_fastq_binding=config['softlink_fastq_binding'],
 		junk_file1=temp('junk_file1.sh'),
-		junk_file2=temp('junk_file2.sh')
-		junk_file3=temp('junk_file3.sh')
-		command='./runAnalysis.sh'
+		junk_file2=temp('junk_file2.sh'),
+		junk_file3=temp('junk_file3.sh'),
 	output:
 		analysis_done=config['output_folder']+'/finished_analysis.txt'
 	threads: config['cpus_to_use']
@@ -117,6 +116,6 @@ rule runAnalysis:
 		-B {input.genome_root_folder}:/genome_info \
 		{params.softlink_fastq_binding} \
 		-B {params.output_dir}/analysis/:/home/analysis \
-		{input.sif_file} {params.junk_file3} {threads}
+		{input.sif_file} bash {params.junk_file3} {threads}
 		touch {output.analysis_done}
 		'''

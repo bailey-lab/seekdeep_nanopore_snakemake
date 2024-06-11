@@ -33,7 +33,7 @@ rule genTargetInfoFromGenomes:
 		genome_subfolder=config['genome_subfolder'],
 		extra_args=config['extra_gen_target_info_cmds']
 	output:
-		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
+		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pm_csp_microsatellite_infos.tab.txt'
 	threads: config['cpus_to_use']
 	resources:
 		time_min=config['max_run_time_min'],
@@ -55,7 +55,7 @@ rule setupTarAmpAnalysis:
 	input:
 		data_folder=config['primer_plus_fastq_binding'],
 		sif_file=config['sif_file_location'],
-		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
+		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pm_csp_microsatellite_infos.tab.txt'
 	params:
 		output_dir=config['output_folder'],
 		primer_file=config['primer_file'],
@@ -87,42 +87,36 @@ rule setupTarAmpAnalysis:
 		touch {output.setup_done}
 		'''
 
-rule setup_analysis:
-	'''
-	A kludgy shell script solution to get snakemake to change directory to the
-	analysis directory, where runAnalysis.sh uses relative paths
-	'''
-	input:
-		setup_done=config['output_folder']+'/finished_setup.txt',
-	threads: config['cpus_to_use']
-	output:
-		final_script=config['output_folder']+'/analysis_script.sh',
-	shell:
-		'''
-		echo cd $'/seekdeep_output/analysis\n./runAnalysis.sh {threads}' >{output.final_script}
-		'''
-
 rule runAnalysis:
 	input:
-		final_script=config['output_folder']+'/analysis_script.sh',
 		data_folder=config['primer_plus_fastq_binding'],
 		sif_file=config['sif_file_location'],
+		setup_done=config['output_folder']+'/finished_setup.txt',
 		genome_root_folder=config['genome_binding']
 	params:
 		output_dir=config['output_folder'],
-		softlink_fastq_binding=config['softlink_fastq_binding']
+		softlink_fastq_binding=config['softlink_fastq_binding'],
+		junk_file1=temp('junk_file1.sh'),
+		junk_file2=temp('junk_file2.sh')
+		junk_file3=temp('junk_file3.sh')
+		command='./runAnalysis.sh'
 	output:
 		analysis_done=config['output_folder']+'/finished_analysis.txt'
+	threads: config['cpus_to_use']
 	resources:
 		time_min=config['max_run_time_min'],
 		mem_mb=config['max_memory_mb'],
 		nodes=config['cpus_to_use']
 	shell:
 		'''
+		echo "cd /home/analysis" >{params.junk_file1}
+		echo "./runAnalysis.sh" >{params.junk_file2}
+		cat {params.junk_file1} {params.junk_file2} >{params.junk_file3}
 		singularity exec -B {input.data_folder}:/input_data \
 		-B {params.output_dir}:/seekdeep_output \
 		-B {input.genome_root_folder}:/genome_info \
 		{params.softlink_fastq_binding} \
-		{input.sif_file} bash /seekdeep_output/analysis_script.sh
+		-B {params.output_dir}/analysis/:/home/analysis \
+		{input.sif_file} {params.junk_file3} {threads}
 		touch {output.analysis_done}
 		'''

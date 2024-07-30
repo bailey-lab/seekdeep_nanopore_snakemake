@@ -1,11 +1,11 @@
-configfile: 'seekdeep_illumina_general.yaml'
+configfile: 'seekdeep_nanopore_general.yaml'
 
 def get_qluster_fastqs(wildcards):
 	output_files=[]
 	samples=[line.strip() for line in open(config['output_folder']+'/non-empty_extractions.txt')]
 	for sample in samples:
-		sample_prefix=sample.split('MID')[1].split('_')[0]
-		output_files.append(config['output_folder']+f'/analysis/{sample_prefix}_extraction/{sample}_qlusterOut/output.fastq.gz')
+		sample_prefix=sample.split('MID')[1]
+		output_files.append(config['output_folder']+f'/analysis/{sample_prefix}_extraction/{sample}_klusterOut/output.fastq.gz')
 	return output_files
 
 import os
@@ -15,10 +15,6 @@ amplicons.remove('locationByIndex')
 
 rule all:
 	input:
-#		all_sample_commands=expand(config['output_folder']+'/qluster_shell_commands/{sample}_qluster_command.sh', sample=[line.strip() for line in open(config['output_folder']+'/non-empty_extractions.txt')]),
-#		qluster_output=get_qluster_fastqs
-#		all_process_cluster_commands=expand(config['output_folder']+'/process_cluster_shell_commands/{amplicon}_process_cluster_command.sh', amplicon=amplicons)
-#		analysis_folder=expand(config['output_folder']+'/analysis/popClustering/{amplicon}/analysis/selectedClustersInfo.tab.txt.gz', amplicon=amplicons)
 		process_pairs=config['output_folder']+'/analysis/reports/allProcessPairsCounts.tab.txt'
 
 rule prep_qluster:
@@ -29,7 +25,8 @@ rule prep_qluster:
 		output_folder=config['output_folder']+'/qluster_shell_commands',
 		analysis_dir='/home/analysis'
 	output:
-		all_sample_commands=expand(config['output_folder']+'/qluster_shell_commands/{sample}_qluster_command.sh', sample=[line.strip() for line in open(config['output_folder']+'/non-empty_extractions.txt')])
+		all_sample_commands=expand(config['output_folder']+'/qluster_shell_commands/{sample}_qluster_command.sh', 
+			sample=[line.strip() for line in open(config['output_folder']+'/non-empty_extractions.txt')])
 	script:
 		'scripts/prep_qluster.py'
 
@@ -44,7 +41,7 @@ rule run_qluster:
 		softlink_fastq_binding=config['softlink_fastq_binding'],
 		singularity_qluster_file='/seekdeep_output/qluster_shell_commands/{sample}_qluster_command.sh'
 	output:
-		qluster_output=config['output_folder']+'/analysis/{sample_prefix}_extraction/{sample}_qlusterOut/output.fastq.gz'
+		qluster_output=config['output_folder']+'/analysis/{sample_prefix}_extraction/{sample}_klusterOut/output.fastq.gz'
 	resources:
 		time_min=config['max_run_time_min'],
 		mem_mb=config['max_memory_mb'],
@@ -68,7 +65,9 @@ rule prep_process_cluster:
 		output_folder=config['output_folder']+'/process_cluster_shell_commands',
 		analysis_dir='/home/analysis'
 	output:
-		all_process_cluster_commands=expand(config['output_folder']+'/process_cluster_shell_commands/{amplicon}_process_cluster_command.sh', amplicon=amplicons)
+		all_process_cluster_commands=expand(config['output_folder'] 
+										+'/process_cluster_shell_commands/{amplicon}_process_cluster_command.sh', 
+										amplicon=amplicons)
 	script:
 		'scripts/prep_process_cluster.py'
 
@@ -120,7 +119,8 @@ rule combine_stats:
 		echo "cd /home/analysis" >{params.junk_file}
 		cat {params.actual_command} >{params.junk_file2}
 		cat {params.junk_file} {params.junk_file2} >{params.actual_command} 
-		singularity exec -B {params.output_dir}:/seekdeep_output \
+		singularity exec \
+			-B {params.output_dir}:/seekdeep_output \
 			-B {params.output_dir}/analysis/:/home/analysis \
 			{input.sif_file} bash {params.singularity_command}
 		'''

@@ -1,12 +1,14 @@
-configfile: 'seekdeep_illumina_general.yaml'
+configfile: 'seekdeep_nanopore_general.yaml'
 
 
-sample_names=config['primer_plus_fastq_binding']+'/'+config['sample_names']
-all_lines=[line.strip().split('\t') for line in open(sample_names)]
-all_reps=[]
-for line in all_lines[1:]:
-	all_reps.extend(line[2:])
-all_reps=sorted(list(set(all_reps)))
+samp_names_file = config['output_folder'] + '/analysis/info/sampNames.tab.txt'
+all_reps = []
+for line in open(samp_names_file, 'r'):
+	line = line.strip().split()
+	sample_reps = [s.split('MID')[1] for s in line[2:]]
+	all_reps.extend(sample_reps)
+all_reps = sorted(list(set(all_reps)))
+
 	
 rule all:
 	input:

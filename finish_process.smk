@@ -51,12 +51,13 @@ rule run_qluster:
 		nodes=config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output \
-		-B {input.genome_root_folder}:/genome_info \
-		-B {params.output_dir}/analysis/:/home/analysis \
-		{params.softlink_fastq_binding} \
-		{input.sif_file} bash {params.singularity_qluster_file}
+		singularity exec \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {params.output_dir}/analysis/:/home/analysis \
+			{params.softlink_fastq_binding} \
+			{input.sif_file} bash {params.singularity_qluster_file}
 		'''
 
 rule prep_process_cluster:
@@ -90,12 +91,13 @@ rule run_process_cluster:
 		nodes=config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output \
-		-B {input.genome_root_folder}:/genome_info \
-		-B {params.output_dir}/analysis/:/home/analysis \
-		{params.softlink_fastq_binding} \
-		{input.sif_file} bash {params.singularity_process_cluster_command}
+		singularity exec \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {params.output_dir}/analysis/:/home/analysis \
+			{params.softlink_fastq_binding} \
+			{input.sif_file} bash {params.singularity_process_cluster_command}
 		'''
 
 rule combine_stats:
@@ -119,8 +121,8 @@ rule combine_stats:
 		cat {params.actual_command} >{params.junk_file2}
 		cat {params.junk_file} {params.junk_file2} >{params.actual_command} 
 		singularity exec -B {params.output_dir}:/seekdeep_output \
-		-B {params.output_dir}/analysis/:/home/analysis \
-		{input.sif_file} bash {params.singularity_command}
+			-B {params.output_dir}/analysis/:/home/analysis \
+			{input.sif_file} bash {params.singularity_command}
 		'''
 
 

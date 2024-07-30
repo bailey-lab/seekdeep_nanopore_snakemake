@@ -44,12 +44,13 @@ rule run_extractor:
 		nodes=config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output \
-		-B {input.genome_root_folder}:/genome_info \
-		-B {params.output_dir}/analysis:/home/analysis \
-		{params.softlink_fastq_binding} \
-		{input.sif_file} bash {params.singularity_shell_script}
+		singularity exec \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {params.output_dir}/analysis:/home/analysis \
+			{params.softlink_fastq_binding} \
+			{input.sif_file} bash {params.singularity_shell_script}
 		'''
 
 rule analyze_extractor:

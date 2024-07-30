@@ -55,14 +55,19 @@ rule genTargetInfoFromGenomes:
 		nodes=config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.genome_root_folder}:/genome_info \
-		-B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output {input.sif_file} \
-		SeekDeep genTargetInfoFromGenomes --primers /input_data/{params.primer_file} \
-		--pairedEndLength {params.read_length} --genomeDir /genome_info/{params.genome_subfolder} \
-		--gffDir /genome_info/{params.gff_subfolder} {params.extra_args} \
-		--dout /seekdeep_output/extractedRefSeqs --overWriteDir --numThreads \
-		{threads}
+		singularity exec \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			{input.sif_file} SeekDeep genTargetInfoFromGenomes \
+				--primers /input_data/{params.primer_file} \
+				--pairedEndLength {params.read_length} \
+				--genomeDir /genome_info/{params.genome_subfolder} \
+				--gffDir /genome_info/{params.gff_subfolder} \
+				{params.extra_args} \
+				--dout /seekdeep_output/extractedRefSeqs \
+				--overWriteDir \
+				--numThreads {threads}
 		'''
 
 rule setupTarAmpAnalysis:
@@ -88,17 +93,22 @@ rule setupTarAmpAnalysis:
 		setup_done=out_folder+'/finished_setup.txt'
 	shell:
 		'''
-		singularity exec -B {input.data_folder}:/input_data \
-		-B {input.genome_root_folder}:/genome_info \
-		-B {params.output_dir}:/seekdeep_output \
-		{params.softlink_fastq_binding} {input.sif_file} \
-		SeekDeep setupTarAmpAnalysis --samples /input_data/{params.sample_names} \
-		--outDir /seekdeep_output/analysis \
-		--inputDir /input_data/{params.fastq_folder} \
-		--idFile /input_data/{params.primer_file} --lenCutOffs \
-		{params.for_seekdeep}/lenCutOffs.txt \
-		--refSeqsDir {params.for_seekdeep}/refSeqs/ {params.extra_args} \
-		{params.extra_extractor_cmds} {params.extra_qluster_cmds} \
-		{params.extra_process_cluster_cmds} --numThreads {threads}
+		singularity exec \
+			-B {input.data_folder}:/input_data \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {params.output_dir}:/seekdeep_output \
+			{params.softlink_fastq_binding} \
+			{input.sif_file} SeekDeep setupTarAmpAnalysis \
+				--samples /input_data/{params.sample_names} \
+				--outDir /seekdeep_output/analysis \
+				--inputDir /input_data/{params.fastq_folder} \
+				--idFile /input_data/{params.primer_file} \
+				--lenCutOffs {params.for_seekdeep}/lenCutOffs.txt \
+				--refSeqsDir {params.for_seekdeep}/refSeqs/ \
+				{params.extra_args} \
+				{params.extra_extractor_cmds} \
+				{params.extra_qluster_cmds} \
+				{params.extra_process_cluster_cmds} \
+				--numThreads {threads}
 		touch {output.setup_done}
 		'''

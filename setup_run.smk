@@ -1,10 +1,12 @@
-configfile: 'seekdeep_illumina_general.yaml'
+configfile: 'seekdeep_nanopore_general.yaml'
+
+
 out_folder=config['output_folder']
 rule all:
 	input:
 		setup_done=out_folder+'/finished_setup.txt',
 		out_snakefile=out_folder+'/snakemake_params/setup_run.smk',
-		out_config_file=out_folder+'/snakemake_params/seekdeep_illumina_general.yaml'
+		out_config_file=out_folder+'/snakemake_params/seekdeep_nanopore_general.yaml'
 
 rule copy_files:
 	'''
@@ -14,16 +16,16 @@ rule copy_files:
 		setup_file='setup_run.smk',
 		extractor_file='run_extractor.smk',
 		finish_file='finish_process.smk',
-		all_steps='run_pipeline.sh',
+		all_steps = 'run_pipeline.sh',
 		scripts='scripts',
-		config_file='seekdeep_illumina_general.yaml'
+		config_file='seekdeep_nanopore_general.yaml'
 	output:
 		setup_file=out_folder+'/snakemake_params/setup_run.smk',
 		extractor_file=out_folder+'/snakemake_params/run_extractor.smk',
 		finish_file=out_folder+'/snakemake_params/finish_process.smk',
 		all_steps=out_folder+'/snakemake_params/run_pipeline.sh',
 		scripts=directory(out_folder+'/snakemake_params/scripts'),
-		config_file=out_folder+'/snakemake_params/seekdeep_illumina_general.yaml'
+		config_file=out_folder+'/snakemake_params/seekdeep_nanopore_general.yaml'
 	shell:
 		'''
 		cp {input.setup_file} {output.setup_file}

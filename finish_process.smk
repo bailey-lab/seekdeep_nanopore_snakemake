@@ -15,7 +15,10 @@ amplicons.remove('locationByIndex')
 
 rule all:
 	input:
-		process_pairs=config['output_folder']+'/analysis/reports/allProcessPairsCounts.tab.txt'
+		# process_pairs=config['output_folder']+'/analysis/reports/allProcessPairsCounts.tab.txt'
+		extraction_profile=config['output_folder']+'/analysis/reports/allExtractionProfile.tab.txt',
+		extraction_stats=config['output_folder']+'/analysis/reports/allExtractionStats.tab.txt',
+
 
 rule prep_qluster:
 	input:
@@ -101,24 +104,30 @@ rule run_process_cluster:
 
 rule combine_stats:
 	input:
-		analysis_folder=expand(config['output_folder']+'/analysis/popClustering/{amplicon}/analysis/selectedClustersInfo.tab.txt.gz', amplicon=amplicons),
-		sif_file=config['sif_file_location']
+		analysis_folder=expand(config['output_folder']
+			+'/analysis/popClustering/{amplicon}/analysis/selectedClustersInfo.tab.txt.gz', 
+			amplicon=amplicons),
+		sif_file=config['sif_file_location'],
+		original_command=config['output_folder']+'/analysis/combineExtractionCountsCmd.sh',
 	params:
 		output_dir=config['output_folder'],
-		actual_command=config['output_folder']+'/analysis/combineExtractionCountsCmd.sh',
-		singularity_command='/home/analysis/combineExtractionCountsCmd.sh',
-		junk_file=temp('junk_file.txt'),
-		junk_file2=temp('junk_file2.txt')
+		singularity_command='/home/analysis/combineExtractionCountsCmd_modified.sh',
+		# junk_file=temp('junk_file.txt'),
+		# junk_file2=temp('junk_file2.txt')
 	output:
+		modified_command=config['output_folder']+'/analysis/combineExtractionCountsCmd_modified.sh',
 		extraction_profile=config['output_folder']+'/analysis/reports/allExtractionProfile.tab.txt',
-		failed_primers=config['output_folder']+'/analysis/reports/combinedAllFailedPrimerCounts.tab.txt',
 		extraction_stats=config['output_folder']+'/analysis/reports/allExtractionStats.tab.txt',
-		process_pairs=config['output_folder']+'/analysis/reports/allProcessPairsCounts.tab.txt'
+		# failed_primers=config['output_folder']+'/analysis/reports/combinedAllFailedPrimerCounts.tab.txt',
+		# process_pairs=config['output_folder']+'/analysis/reports/allProcessPairsCounts.tab.txt'
 	shell:
+		# cat {params.actual_command} >{params.junk_file2}
+		# cat {params.junk_file} {params.junk_file2} >{params.actual_command} 
+		# echo "cd /home/analysis" >{params.junk_file}
 		'''
-		echo "cd /home/analysis" >{params.junk_file}
-		cat {params.actual_command} >{params.junk_file2}
-		cat {params.junk_file} {params.junk_file2} >{params.actual_command} 
+		sed '2i cd /home/analysis
+            /allFailedPrimerCounts.tab.txt/s/^/# /
+            /processPairsCounts.tab.txt/s/^/# /' {input.original_command} >{output.modified_command}
 		singularity exec \
 			-B {params.output_dir}:/seekdeep_output \
 			-B {params.output_dir}/analysis/:/home/analysis \

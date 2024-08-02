@@ -1,4 +1,4 @@
-configfile: 'seekdeep_nanopore_general.yaml'
+configfile: 'seekdeep_nanopore_general_experimental.yaml'
 
 
 samp_names_file = config['output_folder'] + '/analysis/info/sampNames.tab.txt'

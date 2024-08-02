@@ -1,4 +1,4 @@
-configfile: 'seekdeep_nanopore_general.yaml'
+configfile: 'seekdeep_nanopore_general_experimental.yaml'
 
 
 out_folder=config['output_folder']
@@ -18,7 +18,7 @@ rule copy_files:
 		finish_file='finish_process.smk',
 		all_steps = 'run_pipeline.sh',
 		scripts='scripts',
-		config_file='seekdeep_nanopore_general.yaml'
+		config_file='seekdeep_nanopore_general_experimental.yaml'
 	output:
 		setup_file=out_folder+'/snakemake_params/setup_run.smk',
 		extractor_file=out_folder+'/snakemake_params/run_extractor.smk',

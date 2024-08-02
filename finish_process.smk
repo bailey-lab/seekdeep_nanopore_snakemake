@@ -1,4 +1,4 @@
-configfile: 'seekdeep_nanopore_general.yaml'
+configfile: 'seekdeep_nanopore_general_experimental.yaml'
 
 def get_qluster_fastqs(wildcards):
 	output_files=[]

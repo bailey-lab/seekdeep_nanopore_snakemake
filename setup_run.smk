@@ -46,7 +46,7 @@ rule genTargetInfoFromGenomes:
 		primer_file=config['primer_file'],
 		gff_subfolder=config['gff_subfolder'],
 		genome_subfolder=config['genome_subfolder'],
-		fake_insert_size = config['fake_insert_size'],
+		# fake_insert_size = config['fake_insert_size'],
 		extra_args=config['extra_gen_target_info_cmds']
 	output:
 		primer_info=out_folder+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
@@ -63,15 +63,17 @@ rule genTargetInfoFromGenomes:
 			-B {params.output_dir}:/seekdeep_output \
 			{input.sif_file} SeekDeep genTargetInfoFromGenomes \
 				--primers /input_data/{params.primer_file} \
+				--longRangeAmplicon \
+				--useBlast \
 				--genomeDir /genome_info/{params.genome_subfolder} \
 				--gffDir /genome_info/{params.gff_subfolder} \
-				--pairedEndLength {params.fake_insert_size} \
 				{params.extra_args} \
 				--dout /seekdeep_output/extractedRefSeqs \
 				--overWriteDir \
 				--numThreads {threads} \
 				--shortnames
 		'''
+				# --pairedEndLength {params.fake_insert_size} \
 
 rule setupTarAmpAnalysis:
 	input:

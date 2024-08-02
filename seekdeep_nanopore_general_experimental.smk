@@ -33,7 +33,7 @@ rule genTargetInfoFromGenomes:
 		genome_subfolder=config['genome_subfolder'],
 		extra_args=config['extra_gen_target_info_cmds']
 	output:
-		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pm_csp_microsatellite_infos.tab.txt'
+		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
 	threads: config['cpus_to_use']
 	resources:
 		time_min=config['max_run_time_min'],
@@ -41,21 +41,28 @@ rule genTargetInfoFromGenomes:
 		nodes=config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.genome_root_folder}:/genome_info \
-		-B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output {input.sif_file} \
-		SeekDeep genTargetInfoFromGenomes --primers /input_data/{params.primer_file} \
-		--longRangeAmplicon --useBlast --genomeDir /genome_info/{params.genome_subfolder} \
-		--gffDir /genome_info/{params.gff_subfolder} {params.extra_args} \
-		--dout /seekdeep_output/extractedRefSeqs --overWriteDir --numThreads \
-		{threads} --shortNames
+		singularity exec \
+			-B {input.genome_root_folder}:/genome_info \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			{input.sif_file} SeekDeep genTargetInfoFromGenomes \
+				--primers /input_data/{params.primer_file} \
+				--longRangeAmplicon \
+				--useBlast \
+				--genomeDir /genome_info/{params.genome_subfolder} \
+				--gffDir /genome_info/{params.gff_subfolder} \
+				{params.extra_args} \
+				--dout /seekdeep_output/extractedRefSeqs \
+				--overWriteDir \
+				--numThreads {threads} \
+				--shortNames
 		'''
 
 rule setupTarAmpAnalysis:
 	input:
 		data_folder=config['primer_plus_fastq_binding'],
 		sif_file=config['sif_file_location'],
-		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pm_csp_microsatellite_infos.tab.txt'
+		primer_info=config['output_folder']+'/extractedRefSeqs/locationsByGenome/Pf3D7_infos.tab.txt'
 	params:
 		output_dir=config['output_folder'],
 		primer_file=config['primer_file'],
@@ -70,21 +77,23 @@ rule setupTarAmpAnalysis:
 	threads: config['cpus_to_use']
 	shell:
 		'''
-		singularity exec -B {input.data_folder}:/input_data \
-		-B {params.output_dir}:/seekdeep_output \
-		{params.softlink_fastq_binding} {input.sif_file} \
-		SeekDeep setupTarAmpAnalysis  --outDir \
-		/seekdeep_output/analysis --technology nanopore \
-		--uniqueKmersPerTarget \
-		{params.for_seekdeep}/uniqueKmers.tab.txt.gz \
-		--inputDir /input_data/{params.fastq_folder} \
-		--idFile /input_data/{params.primer_file} --lenCutOffs \
-		{params.for_seekdeep}/lenCutOffs.txt \
-		--doNotGuessRecFlags {params.extra_extractor_cmds} \
-		{params.extra_kluster_cmds} {params.extra_process_cluster_cmds} \
-		--previousPopSeqsDir {params.for_seekdeep}/refSeqs/ \
-		--numThreads {threads}
-		touch {output.setup_done}
+		singularity exec \
+			-B {input.data_folder}:/input_data \
+			-B {params.output_dir}:/seekdeep_output \
+			{params.softlink_fastq_binding} \
+			{input.sif_file} SeekDeep setupTarAmpAnalysis  \
+				--outDir /seekdeep_output/analysis \
+				--technology nanopore \
+				--uniqueKmersPerTarget {params.for_seekdeep}/uniqueKmers.tab.txt.gz \
+				--inputDir /input_data/{params.fastq_folder} \
+				--idFile /input_data/{params.primer_file} \
+				--lenCutOffs {params.for_seekdeep}/lenCutOffs.txt \
+				--doNotGuessRecFlags {params.extra_extractor_cmds} \
+				{params.extra_kluster_cmds} \
+				{params.extra_process_cluster_cmds} \
+				--previousPopSeqsDir {params.for_seekdeep}/refSeqs/ \
+				--numThreads {threads}
+			touch {output.setup_done}
 		'''
 
 rule runAnalysis:
